@@ -284,6 +284,31 @@ export const STATUS_COLORS: Record<ReportStatus, string> = {
   REJECTED: "#ef4444",
 };
 
+/**
+ * Status colours used by map markers. The workflow keeps its detailed report
+ * statuses, while the map presents them as the three citizen-facing stages.
+ */
+export interface MapStatusStyle {
+  label: "Reported" | "In Progress" | "Resolved" | "Rejected";
+  color: string;
+}
+
+export const MAP_STATUS_STYLES: Record<ReportStatus, MapStatusStyle> = {
+  PENDING: { label: "Reported", color: "#dc2626" },
+  VERIFIED: { label: "Reported", color: "#dc2626" },
+  CLEANUP_SCHEDULED: { label: "Reported", color: "#dc2626" },
+  IN_PROGRESS: { label: "In Progress", color: "#eab308" },
+  CLEANED: { label: "Resolved", color: "#16a34a" },
+  REJECTED: { label: "Rejected", color: "#64748b" },
+};
+
+export const MAP_STATUS_LEGEND = [
+  { label: "Reported", color: "#dc2626" },
+  { label: "In Progress", color: "#eab308" },
+  { label: "Resolved", color: "#16a34a" },
+  { label: "Rejected", color: "#64748b" },
+] as const;
+
 // ==================== CLEANUP SCHEDULES ====================
 
 export type CleanupScheduleStatus =

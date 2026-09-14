@@ -18,8 +18,9 @@ import {
   WASTE_CATEGORY_LABELS,
   WASTE_CATEGORY_COLORS,
   REPORT_STATUS_LABELS,
-  STATUS_COLORS,
+  MAP_STATUS_STYLES,
 } from "@/types";
+import ReportStatusLegend from "./ReportStatusLegend";
 
 interface WasteMapProps {
   reports: MapReport[];
@@ -72,11 +73,18 @@ function timeAgo(dateStr: string): string {
   return `${Math.floor(h / 24)}d ago`;
 }
 
+function getMapStatusStyle(status: string) {
+  return (
+    (MAP_STATUS_STYLES as Record<string, { label: string; color: string }>)[
+      status
+    ] ?? { label: status, color: "#64748b" }
+  );
+}
+
 function createMarkerIcon(category: string, status: string) {
-  const color =
-    (WASTE_CATEGORY_COLORS as Record<string, string>)[category] || "#3b82f6";
+  const color = getMapStatusStyle(status).color;
   const statusColor =
-    (STATUS_COLORS as Record<string, string>)[status] || "#3b82f6";
+    (WASTE_CATEGORY_COLORS as Record<string, string>)[category] || "#3b82f6";
   const size = 16;
 
   return L.divIcon({
@@ -474,8 +482,7 @@ export default function WasteMap({
       const catColor =
         (WASTE_CATEGORY_COLORS as Record<string, string>)[report.category] ||
         "#3b82f6";
-      const statusColor =
-        (STATUS_COLORS as Record<string, string>)[report.status] || "#3b82f6";
+      const statusColor = getMapStatusStyle(report.status).color;
       const catLabel =
         (WASTE_CATEGORY_LABELS as Record<string, string>)[report.category] ||
         report.category;
@@ -635,6 +642,10 @@ export default function WasteMap({
     }
   }, [reports, showHeatmap]);
 
-  return <div ref={containerRef} className="h-full w-full" />;
+  return (
+    <div className="relative h-full w-full">
+      <div ref={containerRef} className="h-full w-full" />
+      <ReportStatusLegend />
+    </div>
+  );
 }
-

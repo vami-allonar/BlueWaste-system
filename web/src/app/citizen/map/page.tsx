@@ -18,7 +18,7 @@ import {
   MapReport,
   WASTE_CATEGORY_LABELS,
   REPORT_STATUS_LABELS,
-  STATUS_COLORS,
+  MAP_STATUS_STYLES,
 } from "@/types";
 import { timeAgo } from "@/lib/utils";
 
@@ -27,6 +27,10 @@ const WasteMap = dynamic(() => import("@/components/map/WasteMap"), {
 });
 
 const PANABO_CITY_CENTER: [number, number] = [7.3056, 125.6839];
+
+function getMapStatusColor(status: MapReport["status"]) {
+  return MAP_STATUS_STYLES[status]?.color ?? "#64748b";
+}
 
 export default function CitizenMapPage() {
   const [bucket, setBucket] = useState<"" | "with_waste">("");
@@ -161,9 +165,9 @@ export default function CitizenMapPage() {
                   <span
                     className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
                     style={{
-                      backgroundColor: `${STATUS_COLORS[selectedReport.status] || "#3b82f6"}18`,
-                      color: STATUS_COLORS[selectedReport.status] || "#3b82f6",
-                      border: `1px solid ${STATUS_COLORS[selectedReport.status] || "#3b82f6"}40`,
+                      backgroundColor: `${getMapStatusColor(selectedReport.status)}18`,
+                      color: getMapStatusColor(selectedReport.status),
+                      border: `1px solid ${getMapStatusColor(selectedReport.status)}40`,
                     }}
                   >
                     {REPORT_STATUS_LABELS[selectedReport.status] || selectedReport.status}
@@ -245,4 +249,3 @@ export default function CitizenMapPage() {
     </div>
   );
 }
-

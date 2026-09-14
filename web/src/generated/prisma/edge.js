@@ -318,7 +318,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\Charls\\Desktop\\bluewaste-system\\web\\src\\generated\\prisma",
+      "value": "C:\\Users\\Joey Allonar\\Documents\\Bluewaste-system\\web\\src\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -336,12 +336,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\Charls\\Desktop\\bluewaste-system\\web\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\Joey Allonar\\Documents\\Bluewaste-system\\web\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../../prisma",
   "clientVersion": "6.19.3",

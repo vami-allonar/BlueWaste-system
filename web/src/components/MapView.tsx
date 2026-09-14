@@ -13,8 +13,10 @@ import {
   type AdminReport,
   type IncidentMapData,
 } from "@/lib/admin-report";
+import { MAP_STATUS_STYLES } from "@/types";
 import { useAuth } from "@/providers/AuthProvider";
 import api from "@/lib/api";
+import ReportStatusLegend from "./map/ReportStatusLegend";
 
 type MapViewProps = {
   reports: AdminReport[];
@@ -83,6 +85,10 @@ function buildIncidentIcon(color: string, count: number) {
 }
 
 // ─── HTML helpers ─────────────────────────────────────────────────────────────
+
+function getMapStatusColor(status: AdminReport["status"]) {
+  return MAP_STATUS_STYLES[status]?.color ?? "#64748b";
+}
 
 function escapeHtml(value: string) {
   return value
@@ -243,14 +249,6 @@ export default function MapView({
   const drawControlRef = useRef<any>(null);
   const zoneDrawnGroupRef = useRef<L.FeatureGroup | null>(null);
 
-  const icons = useMemo(
-    () => ({
-      withWaste: buildIcon("#ef4444"),
-      noWaste: buildIcon("#22c55e"),
-    }),
-    [],
-  );
-
   // ── Fetch grouped incident data ─────────────────────────────────────────────
 
   useEffect(() => {
@@ -283,8 +281,7 @@ export default function MapView({
   // ── Filtered data ────────────────────────────────────────────────────────────
 
   const filteredReports = useMemo(() => {
-    // Always hide cleaned reports from the map
-    let result = reports.filter((report) => report.status !== "CLEANED");
+    let result = reports;
 
     if (selectedStatus !== "ALL") {
       result = result.filter((report) => report.status === selectedStatus);
@@ -311,7 +308,7 @@ export default function MapView({
   }, [reports, selectedStatus, selectedZoneId, zones]);
 
   const filteredIncidents = useMemo(() => {
-    let result = incidents.filter((inc) => inc.status !== "CLEANED");
+    let result = incidents;
 
     if (selectedStatus !== "ALL") {
       result = result.filter((inc) => inc.status === selectedStatus);
@@ -578,7 +575,7 @@ export default function MapView({
     if (groupedMode) {
       // ── Incident-grouped mode ──────────────────────────────────────────────
       filteredIncidents.forEach((incident) => {
-        const color = incident.category === "with_waste" ? "#ef4444" : "#22c55e";
+        const color = getMapStatusColor(incident.status);
         const icon = buildIncidentIcon(color, incident.contributorCount);
         const marker = L.marker([incident.latitude, incident.longitude], { icon });
         marker.bindPopup(buildIncidentPopupHtml(incident), { maxWidth: 280 });
@@ -588,8 +585,7 @@ export default function MapView({
       // ── Raw per-report mode (original behaviour) ───────────────────────────
       filteredReports.forEach((report) => {
         const marker = L.marker([report.latitude, report.longitude], {
-          icon:
-            report.category === "with_waste" ? icons.withWaste : icons.noWaste,
+          icon: buildIcon(getMapStatusColor(report.status)),
         });
         marker.bindPopup(buildPopupHtml(report), { maxWidth: 260 });
         newMarkers.push(marker);
@@ -608,7 +604,7 @@ export default function MapView({
         mapRef.current?.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
       }
     }
-  }, [filteredReports, filteredIncidents, icons, groupedMode]);
+  }, [filteredReports, filteredIncidents, groupedMode]);
 
   // render reporting zones as polygon layers (and put the selected one into editable group)
   useEffect(() => {
@@ -792,6 +788,7 @@ export default function MapView({
 
       <div className={`relative ${isAdmin ? "h-[62vh]" : "h-[70vh]"}`}>
         <div ref={containerRef} className="h-full w-full" />
+        <ReportStatusLegend />
       </div>
     </div>
   );

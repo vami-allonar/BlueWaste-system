@@ -62,7 +62,6 @@ export class ReportGeoService {
     const where: Prisma.ReportWhereInput = {
       isDeleted: false,
       isSpam: false,
-      status: { not: ReportStatus.CLEANED },
     };
     if (filters?.status) where.status = filters.status;
     if (filters?.category) where.category = filters.category;
@@ -95,10 +94,6 @@ export class ReportGeoService {
       const legacyWhere: Prisma.ReportWhereInput = {};
       if (filters?.status) legacyWhere.status = filters.status;
       if (filters?.category) legacyWhere.category = filters.category;
-
-      if (!filters?.status) {
-        legacyWhere.status = { not: ReportStatus.CLEANED };
-      }
 
       reports = await prisma.report.findMany({
         where: legacyWhere,
@@ -196,9 +191,7 @@ export class ReportGeoService {
       return cached;
     }
 
-    const where: Prisma.WasteIncidentWhereInput = {
-      isResolved: false,
-    };
+    const where: Prisma.WasteIncidentWhereInput = {};
     if (filters?.status) where.status = filters.status;
     if (filters?.category) where.category = filters.category;
 

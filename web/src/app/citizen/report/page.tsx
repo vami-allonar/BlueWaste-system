@@ -297,6 +297,7 @@ export default function SubmitReportPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const analysisAttemptedFileRef = useRef<File | null>(null);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -384,8 +385,10 @@ export default function SubmitReportPage() {
     if (!token) return;
     if (analysisResult) return; // already analyzed
     if (isAnalyzing) return; // already running
+    if (analysisAttemptedFileRef.current === imageFile) return;
 
     const timer = setTimeout(() => {
+      analysisAttemptedFileRef.current = imageFile;
       // Fire and forget — handleAnalyzeWaste manages its own state and errors
       handleAnalyzeWaste();
     }, 300);
@@ -452,6 +455,7 @@ export default function SubmitReportPage() {
     setAnalysisError("");
     setDecisionMessage("");
     setAnalysisResult(null);
+    analysisAttemptedFileRef.current = null;
 
     if (imagePreview) {
       URL.revokeObjectURL(imagePreview);
@@ -513,14 +517,14 @@ export default function SubmitReportPage() {
         : typeof payload?.message === "string" && payload.message.trim().length > 0
           ? payload.message.trim()
           : typeof decisionPayload?.message === "string" &&
-              decisionPayload.message.trim().length > 0
+            decisionPayload.message.trim().length > 0
             ? decisionPayload.message.trim()
             : null;
 
     const captureTips = Array.isArray(decisionPayload?.capture_tips)
       ? decisionPayload.capture_tips.filter(
-          (tip: unknown): tip is string => typeof tip === "string",
-        )
+        (tip: unknown): tip is string => typeof tip === "string",
+      )
       : [];
 
     const categoriesList = Array.isArray(payload?.categories)
@@ -531,7 +535,7 @@ export default function SubmitReportPage() {
 
     const confidenceVal =
       typeof payload?.confidence === "number" &&
-      Number.isFinite(payload.confidence)
+        Number.isFinite(payload.confidence)
         ? payload.confidence
         : 0;
 
@@ -573,7 +577,7 @@ export default function SubmitReportPage() {
       if (result.decision.retakeRecommended) {
         setDecisionMessage(
           result.decision.message ||
-            "Uncertain classification. Please retake the image for better accuracy.",
+          "Uncertain classification. Please retake the image for better accuracy.",
         );
       } else if (!result.has_waste) {
         setDecisionMessage("No waste detected in this image.");
@@ -999,13 +1003,12 @@ export default function SubmitReportPage() {
 
                   {decisionMessage && (
                     <p
-                      className={`rounded-lg border px-3 py-2 text-xs ${
-                        analysisResult?.decision.retakeRecommended
+                      className={`rounded-lg border px-3 py-2 text-xs ${analysisResult?.decision.retakeRecommended
                           ? "border-amber-200 bg-amber-50 text-amber-700"
                           : analysisResult?.has_waste
                             ? "border-green-200 bg-green-50 text-green-700"
                             : "border-slate-200 bg-slate-50 text-slate-600"
-                      }`}
+                        }`}
                     >
                       {decisionMessage}
                     </p>
@@ -1180,11 +1183,10 @@ export default function SubmitReportPage() {
 
                     {/* Submit anonymously option */}
                     <div
-                      className={`flex items-start gap-3 rounded-xl border p-3.5 transition-all ${
-                        isAnonymous
+                      className={`flex items-start gap-3 rounded-xl border p-3.5 transition-all ${isAnonymous
                           ? "border-emerald-200 bg-emerald-50/60 text-emerald-950 shadow-sm"
                           : "border-gray-200 bg-gray-50/50 text-gray-800"
-                      }`}
+                        }`}
                     >
                       <div className="pt-0.5">
                         <input
